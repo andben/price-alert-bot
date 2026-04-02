@@ -1,0 +1,29 @@
+name: Price Alert Check
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # ogni ora esatta (es. 09:00, 10:00, 11:00...)
+  workflow_dispatch:        # consente avvio manuale dal sito GitHub
+
+jobs:
+  check-prices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installa dipendenze
+        run: pip install yfinance
+
+      - name: Controlla prezzi e invia alert
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL:       ${{ secrets.NOTIFY_EMAIL }}
+        run: python price_alert_email.py
